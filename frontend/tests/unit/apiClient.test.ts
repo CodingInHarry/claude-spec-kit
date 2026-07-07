@@ -1,8 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { apiClient, ApiClientError, setActiveUserId } from "../../src/services/apiClient";
+import { apiClient, ApiClientError } from "../../src/services/apiClient";
 
 const originalFetch = global.fetch;
+const STORAGE_KEY = "taskify.activeUserId";
 
 describe("apiClient", () => {
   beforeEach(() => {
@@ -11,11 +12,11 @@ describe("apiClient", () => {
 
   afterEach(() => {
     global.fetch = originalFetch;
-    setActiveUserId(null);
+    localStorage.removeItem(STORAGE_KEY);
   });
 
-  it("sends the active user id header and parses JSON responses", async () => {
-    setActiveUserId("u-pm");
+  it("sends the active user id header (read from localStorage) and parses JSON responses", async () => {
+    localStorage.setItem(STORAGE_KEY, "u-pm");
     (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
       new Response(JSON.stringify({ ok: true }), { status: 200 }),
     );
@@ -25,6 +26,17 @@ describe("apiClient", () => {
     expect(result).toEqual({ ok: true });
     const [, options] = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
     expect((options.headers as Headers).get("X-User-Id")).toBe("u-pm");
+  });
+
+  it("falls back to a bootstrap user id when none is stored yet", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+      new Response(JSON.stringify([]), { status: 200 }),
+    );
+
+    await apiClient.get("/users");
+
+    const [, options] = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
+    expect((options.headers as Headers).get("X-User-Id")).toBe("bootstrap");
   });
 
   it("throws ApiClientError with the server's error payload", async () => {

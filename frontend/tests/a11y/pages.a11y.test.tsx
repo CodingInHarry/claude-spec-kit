@@ -18,7 +18,6 @@ vi.mock("../../src/services/apiClient", () => ({
       { id: "u-eng-1", name: "이서준", role: "Engineer" },
     ]),
   },
-  setActiveUserId: vi.fn(),
 }));
 
 const AXE_OPTIONS: RunOptions = {

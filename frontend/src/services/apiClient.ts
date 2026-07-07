@@ -16,19 +16,16 @@ export class ApiClientError extends Error {
 }
 
 const BASE_URL = "/api";
+const ACTIVE_USER_STORAGE_KEY = "taskify.activeUserId";
 
-let activeUserId: string | null = null;
-
-export function setActiveUserId(userId: string | null): void {
-  activeUserId = userId;
+function getActiveUserId(): string {
+  return localStorage.getItem(ACTIVE_USER_STORAGE_KEY) ?? "bootstrap";
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const headers = new Headers(options.headers);
   headers.set("Content-Type", "application/json");
-  if (activeUserId) {
-    headers.set("X-User-Id", activeUserId);
-  }
+  headers.set("X-User-Id", getActiveUserId());
 
   const response = await fetch(`${BASE_URL}${path}`, { ...options, headers });
 

@@ -19,7 +19,6 @@ vi.mock("../../src/services/apiClient", () => ({
     patch: (...args: unknown[]) => mockPatch(...args),
     delete: (...args: unknown[]) => mockDelete(...args),
   },
-  setActiveUserId: vi.fn(),
 }));
 
 vi.mock("../../src/services/socketClient", () => ({

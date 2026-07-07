@@ -9,7 +9,6 @@ const mockGet = vi.fn();
 
 vi.mock("../../src/services/apiClient", () => ({
   apiClient: { get: (...args: unknown[]) => mockGet(...args) },
-  setActiveUserId: vi.fn(),
 }));
 
 describe("UserPicker", () => {

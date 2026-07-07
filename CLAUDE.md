@@ -114,15 +114,16 @@ npm run lint
 한 명을 선택"하는 플로우를 구현하며, 선택 값을
 `localStorage["taskify.activeUserId"]`에 저장한다.
 
-`services/apiClient.ts`는 `ActiveUserContext`가 동기화하는 모듈 레벨
-변수에서 `X-User-Id`를 가져와 붙이는 얇은 `fetch` 래퍼다. **알려진
-이슈**: 이 동기화가 `useEffect`에서 일어나는데, React는 부모보다 자식
-이펙트를 먼저 실행하므로 사용자를 선택한 직후의 첫 요청(또는
-localStorage에 남아있던 사용자로 새로고침했을 때)이 헤더 없이 먼저
-나가 레이스 컨디션이 발생할 수 있고, 이는 "불러오지 못했습니다" 라는
-가짜 에러 토스트로 나타난다. 사용자 식별 관련 배선을 건드릴 때는,
-현재의 이펙트 기반 동기화 대신 호출 시점에 `localStorage`에서 직접
-동기적으로 읽는 방식을 우선 고려할 것.
+`services/apiClient.ts`는 매 요청마다 `localStorage["taskify.activeUserId"]`를
+직접 읽어 `X-User-Id` 헤더를 붙이는 얇은 `fetch` 래퍼다(값이 없으면
+`"bootstrap"`으로 대체 — 사용자 선택 전 `GET /api/users` 호출용).
+과거에는 이 값을 `ActiveUserContext`의 `useEffect`가 모듈 레벨
+변수로 동기화했는데, React가 부모보다 자식 이펙트를 먼저 실행하는
+탓에 사용자를 막 선택한 직후의 첫 요청이 헤더 없이 나가 "불러오지
+못했습니다" 토스트를 띄우는 레이스 컨디션이 있었다. 지금은 매 요청
+시점에 `localStorage`를 동기적으로 직접 읽도록 바꿔 해당 레이스를
+구조적으로 제거했다 — 사용자 식별 관련 코드를 건드릴 때 이 방식을
+유지할 것(다시 이펙트 기반 캐시/동기화로 되돌리지 말 것).
 
 `KanbanBoard`/`TaskCard`는 드래그 앤 드롭에 `@dnd-kit`을 사용하지만,
 헌법의 접근성 원칙에 따라 모든 드래그 동작에는 `TaskCard`의 키보드로

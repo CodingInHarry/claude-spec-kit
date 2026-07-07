@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
-import { apiClient, setActiveUserId } from "../services/apiClient";
+import { apiClient } from "../services/apiClient";
 import type { User } from "../types";
 
 const STORAGE_KEY = "taskify.activeUserId";
@@ -23,22 +23,15 @@ export function ActiveUserProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setActiveUserId(activeUserId);
-  }, [activeUserId]);
-
-  useEffect(() => {
     async function loadUsers() {
-      setActiveUserId("bootstrap");
       try {
         const list = await apiClient.get<User[]>("/users");
         setUsers(list);
       } finally {
-        setActiveUserId(activeUserId);
         setLoading(false);
       }
     }
     void loadUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const activeUser = useMemo(

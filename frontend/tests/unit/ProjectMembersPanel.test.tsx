@@ -18,7 +18,6 @@ vi.mock("../../src/services/apiClient", () => ({
       return [];
     }),
   },
-  setActiveUserId: vi.fn(),
 }));
 
 const project: Project = {
