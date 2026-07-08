@@ -67,3 +67,6 @@ specs/      spec-kit 기능 명세, 계획, 작업 목록
 프로젝트 전반의 개발 원칙(기술 스택, 테스트 커버리지, 접근성, REST API
 설계, 에러 처리)은 [`.specify/memory/constitution.md`](.specify/memory/constitution.md)에
 정의되어 있습니다.
+
+코드 레벨 네이밍 규칙(파일명, 함수/변수, 에러 코드, 컴포넌트 등)은
+[`docs/naming-conventions.md`](docs/naming-conventions.md)를 참고하세요.
